@@ -49,11 +49,10 @@ const RootQueryType = new GraphQLObjectType({
       resolve: async(parent, {type, margin, exchangeRate}, context, info) => {
         const res = await fetch('https://api.coindesk.com/v1/bpi/currentprice.json');
         const data = await res.json();
-        const { bpi: { USD: { rate }}} = data;
-        const currentExchangeRate = parseFloat(rate);
+        const { bpi: { USD: { rate_float: currentExchangeRate }}} = data;
         const computedUSDRate = type === "sell" ? currentExchangeRate - ((currentExchangeRate * margin)/ 100) : currentExchangeRate + ((currentExchangeRate * margin)/ 100);
         const computedNGNRate = computedUSDRate * exchangeRate
-        return computedNGNRate;
+        return computedNGNRate.toFixed(2);
       }
     }
   })
